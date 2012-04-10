@@ -53,12 +53,12 @@ public class Server {
 
 	/**
 	 * Zahtjev za ukidanjem registracije korisnika sa zadanim podacima.
-	 * @throws NevaljaniKorisničkiPodaciException
+	 * @throws NevaljaniKorisnickiPodaciException
 	 */
 	public void zahtjevZaUkidanjeRegistracije(
 		final String korisničkoIme,
 		final String lozinka
-	) throws NevaljaniKorisničkiPodaciException {
+	) throws NevaljaniKorisnickiPodaciException {
 
 		Objects.requireNonNull(korisničkoIme, "Korisničko ime ne smije biti null!");
 		Objects.requireNonNull(lozinka, "Lozinka ne smije biti null!");
@@ -70,7 +70,7 @@ public class Server {
 				return;
 			}
 		}
-		throw new NevaljaniKorisničkiPodaciException("Korisnik sa zadanim podacima ne postoji!");
+		throw new NevaljaniKorisnickiPodaciException("Korisnik sa zadanim podacima ne postoji!");
 	}
 
 

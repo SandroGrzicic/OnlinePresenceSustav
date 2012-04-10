@@ -1,7 +1,5 @@
 package hr.fer.tel.ops;
 
-import hr.fer.tel.ops.NevaljaniKorisničkiPodaciException;
-import hr.fer.tel.ops.Server;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,20 +53,20 @@ public class ServerTest {
 
 		try {
 			server.zahtjevZaUkidanjeRegistracije(korisničkoIme1, lozinka1);
-		} catch (NevaljaniKorisničkiPodaciException ignored) {}
+		} catch (NevaljaniKorisnickiPodaciException ignored) {}
 
 		assertTrue(server.getBrojKorisnika() == 1);
 
 		try {
 			server.zahtjevZaUkidanjeRegistracije(korisničkoIme2, lozinka2);
-		} catch (NevaljaniKorisničkiPodaciException ignored) {}
+		} catch (NevaljaniKorisnickiPodaciException ignored) {}
 
 		assertTrue(server.getBrojKorisnika() == 0);
 
 	}
 
-	@Test(expected=NevaljaniKorisničkiPodaciException.class)
-	public void testZahtjevZaUkidanjeRegistracijeException() throws NevaljaniKorisničkiPodaciException {
+	@Test(expected=NevaljaniKorisnickiPodaciException.class)
+	public void testZahtjevZaUkidanjeRegistracijeException() throws NevaljaniKorisnickiPodaciException {
 		server.zahtjevZaRegistracijom(korisničkoIme1, lozinka1);
 		server.zahtjevZaUkidanjeRegistracije(korisničkoIme1, lozinka2);
 	}
