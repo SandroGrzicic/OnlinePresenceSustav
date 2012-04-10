@@ -1,7 +1,7 @@
 package net.sandrogrzicic.java.fp;
 
 /**
- * Represent one of the possible Either values.
+ * Represents one of the possible Either values.
  */
 public class Left<T> extends Either<T, Void> {
 
