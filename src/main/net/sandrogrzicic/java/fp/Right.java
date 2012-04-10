@@ -5,23 +5,30 @@ package net.sandrogrzicic.java.fp;
  */
 public class Right<T> extends Either<Void, T> {
 
-	protected final T right;
-
-	public Right() {
-		right = null;
-	}
+	public final T right;
 
 	public Right(T result) {
 		right = result;
 	}
 
 	@Override
-	boolean isLeft() {
+	public boolean isLeft() {
 		return false;
 	}
 
 	@Override
-	boolean isRight() {
+	public boolean isRight() {
 		return true;
 	}
+
+	@Override
+	public Void getLeft() {
+		throw new RuntimeException("Right doesn't have a Left!");
+	}
+
+	@Override
+	public T getRight() {
+		return right;
+	}
+
 }

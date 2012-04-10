@@ -4,8 +4,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Test za poslužitelj.
@@ -31,43 +29,37 @@ public class ServerTest {
 
 	@Test
 	public void testZahtjevZaRegistracijom() throws Exception {
-		assertTrue(server.getBrojKorisnika() == 0);
-		assertTrue(server.zahtjevZaRegistracijom(korisničkoIme1, lozinka1));
-		assertTrue(server.getBrojKorisnika() == 1);
+		assert(server.getBrojKorisnika() == 2);
+		assert(server.zahtjevZaRegistracijom(korisničkoIme1, lozinka1).isRight());
+		assert(server.getBrojKorisnika() == 1);
 
-		assertFalse(server.zahtjevZaRegistracijom(korisničkoIme1, lozinka1));
-		assertTrue(server.getBrojKorisnika() == 1);
+		assert(server.zahtjevZaRegistracijom(korisničkoIme1, lozinka1).isLeft());
+		assert(server.getBrojKorisnika() == 1);
 
-		assertTrue(server.zahtjevZaRegistracijom(korisničkoIme2, lozinka2));
-		assertTrue(server.getBrojKorisnika() == 2);
+		assert(server.zahtjevZaRegistracijom(korisničkoIme2, lozinka2).isRight());
+		assert(server.getBrojKorisnika() == 2);
 
-		assertFalse(server.zahtjevZaRegistracijom(korisničkoIme2, lozinka2));
-		assertTrue(server.getBrojKorisnika() == 2);
+		assert(server.zahtjevZaRegistracijom(korisničkoIme2, lozinka2).isLeft());
+		assert(server.getBrojKorisnika() == 2);
 	}
+
+
 
 	@Test
 	public void testZahtjevZaUkidanjeRegistracije() {
 		server.zahtjevZaRegistracijom(korisničkoIme1, lozinka1);
 		server.zahtjevZaRegistracijom(korisničkoIme2, lozinka2);
-		assertTrue(server.getBrojKorisnika() == 2);
+		assert(server.getBrojKorisnika() == 2);
 
-		try {
-			server.zahtjevZaUkidanjeRegistracije(korisničkoIme1, lozinka1);
-		} catch (NevaljaniKorisnickiPodaciException ignored) {}
+		assert(server.zahtjevZaUkidanjeRegistracije(korisničkoIme1, lozinka1).isRight());
+		assert(server.getBrojKorisnika() == 1);
 
-		assertTrue(server.getBrojKorisnika() == 1);
+		assert(server.zahtjevZaUkidanjeRegistracije(korisničkoIme2, lozinka1).isLeft());
+		assert(server.getBrojKorisnika() == 1);
 
-		try {
-			server.zahtjevZaUkidanjeRegistracije(korisničkoIme2, lozinka2);
-		} catch (NevaljaniKorisnickiPodaciException ignored) {}
-
-		assertTrue(server.getBrojKorisnika() == 0);
+		assert(server.zahtjevZaUkidanjeRegistracije(korisničkoIme2, lozinka2).isRight());
+		assert(server.getBrojKorisnika() == 0);
 
 	}
 
-	@Test(expected=NevaljaniKorisnickiPodaciException.class)
-	public void testZahtjevZaUkidanjeRegistracijeException() throws NevaljaniKorisnickiPodaciException {
-		server.zahtjevZaRegistracijom(korisničkoIme1, lozinka1);
-		server.zahtjevZaUkidanjeRegistracije(korisničkoIme1, lozinka2);
-	}
 }

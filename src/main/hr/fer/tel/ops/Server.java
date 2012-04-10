@@ -19,6 +19,7 @@ public class Server {
 		korisnici = new HashMap<>();
 	}
 
+
 	/**
 	 * Zahtjev za registracijom korisnika sa zadanim podacima.
 	 * @return Right ako je registracija uspjela; Left ako korisnik sa zadanim imenom već postoji.
@@ -40,25 +41,14 @@ public class Server {
 		}
 	}
 
-	/**
-	 * @return Složenost zadane lozinke.
-	 */
-	protected static boolean provjeriSloženostLozinke(final String lozinka) {
-		if (lozinka.length() < 6) {
-			return false;
-		}
-		return true;
-	}
 
 
 	/**
 	 * Zahtjev za ukidanjem registracije korisnika sa zadanim podacima.
 	 * @throws NevaljaniKorisnickiPodaciException
 	 */
-	public void zahtjevZaUkidanjeRegistracije(
-		final String korisničkoIme,
-		final String lozinka
-	) throws NevaljaniKorisnickiPodaciException {
+	@SuppressWarnings("unchecked")
+	public Either<String, String> zahtjevZaUkidanjeRegistracije(final String korisničkoIme, final String lozinka) {
 
 		Objects.requireNonNull(korisničkoIme, "Korisničko ime ne smije biti null!");
 		Objects.requireNonNull(lozinka, "Lozinka ne smije biti null!");
@@ -67,15 +57,26 @@ public class Server {
 		if (korisnik != null) {
 			if (korisnik.provjeriLozinku(lozinka)) {
 				korisnici.remove(korisničkoIme);
-				return;
+				return new Right("Registracija uspješno ukinuta.");
 			}
 		}
-		throw new NevaljaniKorisnickiPodaciException("Korisnik sa zadanim podacima ne postoji!");
+		return new Left("Korisnik sa zadanim podacima ne postoji!");
 	}
+
 
 
 	public int getBrojKorisnika() {
 		return korisnici.size();
+	}
+
+	/**
+	 * @return Složenost zadane lozinke.
+	 */
+	protected static boolean provjeriSloženostLozinke(final String lozinka) {
+		if (lozinka.length() < 6) {
+			return false;
+		}
+		return true;
 	}
 
 }

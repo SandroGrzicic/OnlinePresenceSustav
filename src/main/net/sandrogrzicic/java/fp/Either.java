@@ -5,7 +5,10 @@ package net.sandrogrzicic.java.fp;
  */
 public abstract class Either<L, R> {
 
-	abstract boolean isLeft();
-	abstract boolean isRight();
+	public abstract boolean isLeft();
+	public abstract boolean isRight();
 
+	public abstract L getLeft();
+	public abstract R getRight();
 }
+
