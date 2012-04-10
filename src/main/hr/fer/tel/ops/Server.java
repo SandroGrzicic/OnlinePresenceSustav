@@ -15,7 +15,7 @@ public class Server {
 	protected final Map<String, Korisnik> korisnici = new HashMap<>();
 
 	/** Registrirani watcheri svih presentitya. */
-	protected final Map<String, Set<Korisnik>> watcheriPresentitya = new HashMap<>();
+	protected final Map<String, Set<String>> watcheriPresentitya = new HashMap<>();
 
 	/** Trenutna stanja prisutnosti svih presentitya. */
 	protected final Map<String, Prisutnost> prisutnosti = new HashMap<>();
@@ -37,9 +37,9 @@ public class Server {
 		}
 
 		if (!korisnici.containsKey(korisničkoIme)) {
-			final Korisnik noviKorisnik = new Korisnik(korisničkoIme, lozinka);
+			final Korisnik noviKorisnik = new Korisnik(this, korisničkoIme, lozinka);
 			korisnici.put(korisničkoIme, noviKorisnik);
-			watcheriPresentitya.put(korisničkoIme, new HashSet<Korisnik>());
+			watcheriPresentitya.put(korisničkoIme, new HashSet<String>());
 			prisutnosti.put(korisničkoIme, Prisutnost.SLOBODAN);
 
 			return new Right("Registracija uspjela.");
@@ -68,9 +68,25 @@ public class Server {
 		return new Left("Korisnik sa zadanim podacima ne postoji!");
 	}
 
-
+	/**
+	 * Šalje traženom presentityu zahtjev za praćenjem koji potječe od zadanog watchera.
+	 */
 	public void zahtjevZaPraćenjem(final String watcher, final String presentity, final VrstaPraćenja vrstaPraćenja) {
 		korisnici.get(presentity).zahtjevZaPraćenjem(new ZahtjevZaPraćenjem(this, watcher, vrstaPraćenja));
+	}
+
+	/** Šalje zadanom watcheru odgovor na zahtjev za praćenjem traženog presentitya. */
+	public void odgovorNaZahtjevZaPraćenjem(final String presentityIme, final String watcherIme, final boolean odgovor) {
+		final Korisnik watcher = korisnici.get(watcherIme);
+
+		if (odgovor) {
+			watcheriPresentitya.get(presentityIme).add(watcherIme);
+			watcher.odgovorenoNaZahtjevZaPraćenjem(presentityIme, true);
+			watcher.promjenaPrisutnosti(presentityIme, prisutnosti.get(presentityIme));
+		} else {
+			watcher.odgovorenoNaZahtjevZaPraćenjem(presentityIme, false);
+		}
+
 	}
 
 
@@ -88,15 +104,27 @@ public class Server {
 		return true;
 	}
 
-	public void odgovorNaZahtjevZaPraćenjem(final String presentityIme, final String watcherIme, final boolean odgovor) {
-		final Korisnik watcher = korisnici.get(watcherIme);
+	/**
+	 * Javlja svim registriranim aktivnim watcherima novu prisutnost zadanog presentitya.
+	 */
+	public void promjenaPrisutnosti(final String korisničkoIme, final Prisutnost prisutnost) {
+		prisutnosti.put(korisničkoIme, prisutnost);
 
-		if (odgovor) {
-			watcheriPresentitya.get(presentityIme).add(watcher);
-			watcher.odgovorenoNaZahtjevZaPraćenjem(presentityIme, true);
-			watcher.promjenaPrisutnosti(presentityIme, prisutnosti.get(presentityIme));
+		for (final String watcher: watcheriPresentitya.get(korisničkoIme)) {
+			korisnici.get(watcher).promjenaPrisutnosti(korisničkoIme, prisutnost);
+		}
+	}
+
+	/**
+	 * Dohvaća prisutnost zadanog presentitya.
+	 * @return Prisutnost wrappana u Right ako watcher ima dozvolu, Left ako nema.
+	 */
+	@SuppressWarnings("unchecked")
+	public Either<String, Prisutnost> dohvatiPrisutnost(final String watcher, final String presentity) {
+		if (watcheriPresentitya.get(presentity).contains(watcher)) {
+			return new Right(prisutnosti.get(presentity));
 		} else {
-			watcher.odgovorenoNaZahtjevZaPraćenjem(presentityIme, false);
+			return new Left("Watcher nema dozvolu za dohvat prisutnosti zadanog entitya!");
 		}
 
 	}

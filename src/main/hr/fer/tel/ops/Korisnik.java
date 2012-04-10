@@ -12,6 +12,8 @@ import java.util.*;
  */
 public class Korisnik {
 
+	protected Server server;
+
 	/** Korisničko ime ovog korisnika. */
 	public final String korisničkoIme;
 
@@ -31,6 +33,7 @@ public class Korisnik {
 	protected static final MessageDigest messageDigest;
 
 
+
 	static {
 		try {
 			messageDigest = MessageDigest.getInstance("SHA-256");
@@ -43,12 +46,23 @@ public class Korisnik {
 	/**
 	 * Kreira novog Korisnika sa zadanim ne-null korisničkim imenom i lozinkom.
 	 */
-	public Korisnik(final String korisničkoIme, final String lozinka) {
+	public Korisnik(final Server server, final String korisničkoIme, final String lozinka) {
+		this.server = server;
 		this.korisničkoIme = Objects.requireNonNull(korisničkoIme, "Korisničko ime ne smije biti null!");
 
 		Objects.requireNonNull(lozinka, "Lozinka ne smije biti null!");
 		this.lozinkaSalt = new BigInteger(128, random).toByteArray();
 		this.lozinka = hashiraj(lozinka, lozinkaSalt);
+	}
+
+	public Prisutnost getPrisutnost() {
+		return prisutnost;
+	}
+
+	/** Postavlja trenutnu prisutnost ovog presentitya te obavještava server o promjeni. */
+	public void setPrisutnost(final Prisutnost prisutnost) {
+		this.prisutnost = prisutnost;
+		this.server.promjenaPrisutnosti(korisničkoIme, prisutnost);
 	}
 
 	/**
@@ -85,18 +99,17 @@ public class Korisnik {
 	}
 
 	/**
-	 * Zahtjev za praćenjem od strane potencijalnog watchera koji želi pratiti ovaj presentity.
+	 * Prima zahtjev za praćenjem od strane potencijalnog watchera koji želi pratiti ovaj presentity.
 	 */
 	public void zahtjevZaPraćenjem(final ZahtjevZaPraćenjem zahtjev) {
-		  zahtjeviZaPraćenjem.add(zahtjev);
+		zahtjeviZaPraćenjem.add(zahtjev);
 	}
 
+	/**
+	 * Odgovara na zadani zahtjev za praćenjem ovog presentitya.
+	 */
 	public void odgovoriNaZahtjevZaPraćenjem(final ZahtjevZaPraćenjem zahtjev, boolean odgovor) {
 		zahtjev.server.odgovorNaZahtjevZaPraćenjem(this.korisničkoIme, zahtjev.watcher, odgovor);
-	}
-
-	public Prisutnost getPrisutnost() {
-		return prisutnost;
 	}
 
 	/**
