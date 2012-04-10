@@ -4,8 +4,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Predstavlja korisnika sustava.
@@ -19,9 +18,18 @@ public class Korisnik {
 	protected final byte[] lozinka;
 	protected final byte[] lozinkaSalt;
 
+	protected Prisutnost prisutnost = Prisutnost.SLOBODAN;
+
+	/** Trenutni neodgovoreni zahtjevi za praćenjem od strane watchera za ovog presentitya. */
+	protected final Set<ZahtjevZaPraćenjem> zahtjeviZaPraćenjem = new HashSet<>();
+
+	/** Trenutna stanja prisutnosti presentitya koje prati ovaj watcher. */
+	protected final Map<String, Prisutnost> prisutnosti = new HashMap<>();
+
 	protected static SecureRandom random = new SecureRandom();
 
 	protected static final MessageDigest messageDigest;
+
 
 	static {
 		try {
@@ -75,4 +83,35 @@ public class Korisnik {
 	public boolean provjeriLozinku(final String lozinka) {
 		return Arrays.equals(this.lozinka, hashiraj(lozinka, this.lozinkaSalt));
 	}
+
+	/**
+	 * Zahtjev za praćenjem od strane potencijalnog watchera koji želi pratiti ovaj presentity.
+	 */
+	public void zahtjevZaPraćenjem(final ZahtjevZaPraćenjem zahtjev) {
+		  zahtjeviZaPraćenjem.add(zahtjev);
+	}
+
+	public void odgovoriNaZahtjevZaPraćenjem(final ZahtjevZaPraćenjem zahtjev, boolean odgovor) {
+		zahtjev.server.odgovorNaZahtjevZaPraćenjem(this.korisničkoIme, zahtjev.watcher, odgovor);
+	}
+
+	public Prisutnost getPrisutnost() {
+		return prisutnost;
+	}
+
+	/**
+	 * Dojavljuje ovom watcheru da je zadani presentity promijenio stanje prisutnosti.
+	 */
+	public void promjenaPrisutnosti(final String presentity, final Prisutnost prisutnost) {
+		prisutnosti.put(presentity, prisutnost);
+	}
+
+
+	/**
+	 * Dojavljuje ovom watcheru odgovor na zahtjev za praćenjem.
+	 */
+	public void odgovorenoNaZahtjevZaPraćenjem(final String presentity, final boolean odgovor) {
+		System.out.println("Odgovor na zahtjev za praćenjem " + presentity + ": " + odgovor);
+	}
+
 }

@@ -29,7 +29,7 @@ public class ServerTest {
 
 	@Test
 	public void testZahtjevZaRegistracijom() throws Exception {
-		assert(server.getBrojKorisnika() == 2);
+		assert(server.getBrojKorisnika() == 0);
 		assert(server.zahtjevZaRegistracijom(korisničkoIme1, lozinka1).isRight());
 		assert(server.getBrojKorisnika() == 1);
 

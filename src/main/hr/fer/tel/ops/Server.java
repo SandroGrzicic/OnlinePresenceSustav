@@ -4,21 +4,24 @@ import net.sandrogrzicic.java.fp.Either;
 import net.sandrogrzicic.java.fp.Left;
 import net.sandrogrzicic.java.fp.Right;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Glavni poslužitelj sustava.
  */
 public class Server {
 
-	protected final Map<String, Korisnik> korisnici;
+	/** Registrirani korisnici. */
+	protected final Map<String, Korisnik> korisnici = new HashMap<>();
+
+	/** Registrirani watcheri svih presentitya. */
+	protected final Map<String, Set<Korisnik>> watcheriPresentitya = new HashMap<>();
+
+	/** Trenutna stanja prisutnosti svih presentitya. */
+	protected final Map<String, Prisutnost> prisutnosti = new HashMap<>();
 
 	public Server() {
-		korisnici = new HashMap<>();
 	}
-
 
 	/**
 	 * Zahtjev za registracijom korisnika sa zadanim podacima.
@@ -34,7 +37,11 @@ public class Server {
 		}
 
 		if (!korisnici.containsKey(korisničkoIme)) {
-			korisnici.put(korisničkoIme, new Korisnik(korisničkoIme, lozinka));
+			final Korisnik noviKorisnik = new Korisnik(korisničkoIme, lozinka);
+			korisnici.put(korisničkoIme, noviKorisnik);
+			watcheriPresentitya.put(korisničkoIme, new HashSet<Korisnik>());
+			prisutnosti.put(korisničkoIme, Prisutnost.SLOBODAN);
+
 			return new Right("Registracija uspjela.");
 		} else {
 			return new Left("Korisnik već postoji!");
@@ -42,14 +49,12 @@ public class Server {
 	}
 
 
-
 	/**
 	 * Zahtjev za ukidanjem registracije korisnika sa zadanim podacima.
-	 * @throws NevaljaniKorisnickiPodaciException
+	 * @return Right ako je ukidanje uspjelo; Left ako podaci nisu ispravni.
 	 */
 	@SuppressWarnings("unchecked")
 	public Either<String, String> zahtjevZaUkidanjeRegistracije(final String korisničkoIme, final String lozinka) {
-
 		Objects.requireNonNull(korisničkoIme, "Korisničko ime ne smije biti null!");
 		Objects.requireNonNull(lozinka, "Lozinka ne smije biti null!");
 
@@ -63,6 +68,10 @@ public class Server {
 		return new Left("Korisnik sa zadanim podacima ne postoji!");
 	}
 
+
+	public void zahtjevZaPraćenjem(final String watcher, final String presentity, final VrstaPraćenja vrstaPraćenja) {
+		korisnici.get(presentity).zahtjevZaPraćenjem(new ZahtjevZaPraćenjem(this, watcher, vrstaPraćenja));
+	}
 
 
 	public int getBrojKorisnika() {
@@ -79,4 +88,16 @@ public class Server {
 		return true;
 	}
 
+	public void odgovorNaZahtjevZaPraćenjem(final String presentityIme, final String watcherIme, final boolean odgovor) {
+		final Korisnik watcher = korisnici.get(watcherIme);
+
+		if (odgovor) {
+			watcheriPresentitya.get(presentityIme).add(watcher);
+			watcher.odgovorenoNaZahtjevZaPraćenjem(presentityIme, true);
+			watcher.promjenaPrisutnosti(presentityIme, prisutnosti.get(presentityIme));
+		} else {
+			watcher.odgovorenoNaZahtjevZaPraćenjem(presentityIme, false);
+		}
+
+	}
 }
