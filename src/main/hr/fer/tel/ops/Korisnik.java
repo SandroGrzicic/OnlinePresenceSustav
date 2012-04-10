@@ -23,7 +23,7 @@ public class Korisnik {
 	protected Prisutnost prisutnost = Prisutnost.SLOBODAN;
 
 	/** Trenutni neodgovoreni zahtjevi za praćenjem od strane watchera za ovog presentitya. */
-	protected final Set<ZahtjevZaPraćenjem> zahtjeviZaPraćenjem = new HashSet<>();
+	protected final Set<Praćenje> zahtjeviZaPraćenjem = new HashSet<>();
 
 	/** Trenutna stanja prisutnosti presentitya koje prati ovaj watcher. */
 	protected final Map<String, Prisutnost> prisutnosti = new HashMap<>();
@@ -101,15 +101,15 @@ public class Korisnik {
 	/**
 	 * Prima zahtjev za praćenjem od strane potencijalnog watchera koji želi pratiti ovaj presentity.
 	 */
-	public void zahtjevZaPraćenjem(final ZahtjevZaPraćenjem zahtjev) {
+	public void zahtjevZaPraćenjem(final Praćenje zahtjev) {
 		zahtjeviZaPraćenjem.add(zahtjev);
 	}
 
 	/**
 	 * Odgovara na zadani zahtjev za praćenjem ovog presentitya.
 	 */
-	public void odgovoriNaZahtjevZaPraćenjem(final ZahtjevZaPraćenjem zahtjev, boolean odgovor) {
-		zahtjev.server.odgovorNaZahtjevZaPraćenjem(this.korisničkoIme, zahtjev.watcher, odgovor);
+	public void odgovoriNaZahtjevZaPraćenjem(final Praćenje zahtjev, boolean odgovor) {
+		server.odgovorNaZahtjevZaPraćenjem(this.korisničkoIme, zahtjev, odgovor);
 	}
 
 	/**
@@ -123,8 +123,18 @@ public class Korisnik {
 	/**
 	 * Dojavljuje ovom watcheru odgovor na zahtjev za praćenjem.
 	 */
-	public void odgovorenoNaZahtjevZaPraćenjem(final String presentity, final boolean odgovor) {
+	public void odgovorNaZahtjevZaPraćenjem(final String presentity, final boolean odgovor) {
 		System.out.println("Odgovor na zahtjev za praćenjem " + presentity + ": " + odgovor);
+	}
+
+	/** Dojavljuje serveru da ukloni zadanog watchera sa liste watchera ovog presentitya. */
+	public void ukiniPraćenjeZaWatchera(final String watcher) {
+		server.ukiniPraćenje(korisničkoIme, watcher);
+	}
+
+	/** Dojavljuje serveru da ukloni ovog watchera sa sa liste watchera zadanog presentitya. */
+	public void ukiniPraćenjePresentitya(final String presentity) {
+		server.ukiniPraćenje(presentity, korisničkoIme);
 	}
 
 }
