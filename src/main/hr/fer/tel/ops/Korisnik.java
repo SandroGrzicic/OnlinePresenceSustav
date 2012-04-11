@@ -23,7 +23,7 @@ public class Korisnik {
 	protected Prisutnost prisutnost = Prisutnost.SLOBODAN;
 
 	/** Trenutni neodgovoreni zahtjevi za praćenjem od strane watchera za ovog presentitya. */
-	protected final Set<Praćenje> zahtjeviZaPraćenjem = new HashSet<>();
+	protected final Set<Pracenje> zahtjeviZaPraćenjem = new HashSet<>();
 
 	/** Trenutna stanja prisutnosti presentitya koje prati ovaj watcher. */
 	protected final Map<String, Prisutnost> prisutnosti = new HashMap<>();
@@ -101,14 +101,14 @@ public class Korisnik {
 	/**
 	 * Prima zahtjev za praćenjem od strane potencijalnog watchera koji želi pratiti ovaj presentity.
 	 */
-	public void zahtjevZaPraćenjem(final Praćenje zahtjev) {
+	public void zahtjevZaPraćenjem(final Pracenje zahtjev) {
 		zahtjeviZaPraćenjem.add(zahtjev);
 	}
 
 	/**
 	 * Odgovara na zadani zahtjev za praćenjem ovog presentitya.
 	 */
-	public void odgovoriNaZahtjevZaPraćenjem(final Praćenje zahtjev, boolean odgovor) {
+	public void odgovoriNaZahtjevZaPraćenjem(final Pracenje zahtjev, boolean odgovor) {
 		server.odgovorNaZahtjevZaPraćenjem(this.korisničkoIme, zahtjev, odgovor);
 	}
 
