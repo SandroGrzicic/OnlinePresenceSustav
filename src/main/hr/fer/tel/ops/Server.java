@@ -17,9 +17,6 @@ public class Server {
 	/** Registrirani watcheri svih presentitya. */
 	protected final Map<String, Set<Pracenje>> watcheriPresentitya = new HashMap<>();
 
-	/** Trenutna stanja prisutnosti svih presentitya. */
-	protected final Map<String, Prisutnost> prisutnosti = new HashMap<>();
-
 	public Server() {
 	}
 
@@ -40,7 +37,6 @@ public class Server {
 			final Korisnik noviKorisnik = new Korisnik(this, korisničkoIme, lozinka);
 			korisnici.put(korisničkoIme, noviKorisnik);
 			watcheriPresentitya.put(korisničkoIme, new HashSet<Pracenje>());
-			prisutnosti.put(korisničkoIme, Prisutnost.SLOBODAN);
 
 			return new Right("Registracija uspjela.");
 		} else {
@@ -82,7 +78,7 @@ public class Server {
 		if (odgovor) {
 			watcheriPresentitya.get(presentity).add(zahtjev);
 			watcher.odgovorNaZahtjevZaPraćenjem(presentity, true);
-			watcher.promjenaPrisutnosti(presentity, prisutnosti.get(presentity));
+			watcher.promjenaPrisutnosti(presentity, korisnici.get(presentity).getPrisutnost());
 		} else {
 			watcher.odgovorNaZahtjevZaPraćenjem(presentity, false);
 		}
@@ -107,12 +103,12 @@ public class Server {
 	/**
 	 * Javlja svim registriranim aktivnim watcherima novu prisutnost zadanog presentitya.
 	 */
-	public void promjenaPrisutnosti(final String korisničkoIme, final Prisutnost prisutnost) {
-		prisutnosti.put(korisničkoIme, prisutnost);
+	public void promjenaPrisutnosti(final String presentity, final Prisutnost prisutnost) {
+		korisnici.get(presentity).setPrisutnost(prisutnost);
 
-		for (final Pracenje praćenje: watcheriPresentitya.get(korisničkoIme)) {
+		for (final Pracenje praćenje: watcheriPresentitya.get(presentity)) {
 			if (praćenje.vrstaPraćenja == VrstaPracenja.AKTIVNO) {
-				korisnici.get(praćenje.watcher).promjenaPrisutnosti(korisničkoIme, prisutnost);
+				korisnici.get(praćenje.watcher).promjenaPrisutnosti(presentity, prisutnost);
 			}
 		}
 	}
@@ -133,7 +129,7 @@ public class Server {
 	@SuppressWarnings("unchecked")
 	public Either<String, Prisutnost> dohvatiPrisutnost(final Pracenje pracenje, final String presentity) {
 		if (watcheriPresentitya.get(presentity).contains(pracenje)) {
-			return new Right(prisutnosti.get(presentity));
+			return new Right(korisnici.get(presentity).getPrisutnost());
 		} else {
 			return new Left("Watcher nema dozvolu za dohvat prisutnosti zadanog entitya!");
 		}

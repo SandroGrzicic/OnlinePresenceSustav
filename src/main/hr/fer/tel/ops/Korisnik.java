@@ -104,13 +104,6 @@ public class Korisnik {
 	}
 
 	/**
-	 * Odgovara na zadani zahtjev za praćenjem ovog presentitya.
-	 */
-	public void odgovoriNaZahtjevZaPraćenjem(final Pracenje zahtjev, boolean odgovor) {
-		server.odgovorNaZahtjevZaPraćenjem(this.korisničkoIme, zahtjev, odgovor);
-	}
-
-	/**
 	 * Dojavljuje ovom watcheru da je zadani presentity promijenio stanje prisutnosti.
 	 */
 	public void promjenaPrisutnosti(final String presentity, final Prisutnost prisutnost) {
