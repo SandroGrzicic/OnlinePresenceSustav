@@ -1,5 +1,7 @@
 package hr.fer.tel.ops;
 
+import net.sandrogrzicic.java.fp.*;
+
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -110,14 +112,6 @@ public class Korisnik {
 		prisutnosti.put(presentity, prisutnost);
 	}
 
-
-	/**
-	 * Dojavljuje ovom watcheru odgovor na zahtjev za praćenjem.
-	 */
-	public void odgovorNaZahtjevZaPraćenjem(final String presentity, final boolean odgovor) {
-		System.out.println("Odgovor na zahtjev za praćenjem " + presentity + ": " + odgovor);
-	}
-
 	/** Dojavljuje serveru da ukloni zadanog watchera sa liste watchera ovog presentitya. */
 	public void ukiniPraćenjeZaWatchera(final String watcher) {
 		server.ukiniPraćenje(korisničkoIme, watcher);
@@ -128,4 +122,14 @@ public class Korisnik {
 		server.ukiniPraćenje(presentity, korisničkoIme);
 	}
 
+	/** @return trenutna prisutnost zadanog watchanog presentitya wrappana u Right, inače vraća Left. */
+	@SuppressWarnings("unchecked")
+	public Either<String, Prisutnost> dohvatiPrisutnostZa(final String presentity) {
+		if (prisutnosti.containsKey(presentity)) {
+			return new Right(prisutnosti.get(presentity));
+		} else {
+			return new Left("Zadani presentity nije praćen!");
+		}
+
+	}
 }

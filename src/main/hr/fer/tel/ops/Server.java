@@ -1,8 +1,6 @@
 package hr.fer.tel.ops;
 
-import net.sandrogrzicic.java.fp.Either;
-import net.sandrogrzicic.java.fp.Left;
-import net.sandrogrzicic.java.fp.Right;
+import net.sandrogrzicic.java.fp.*;
 
 import java.util.*;
 
@@ -67,8 +65,20 @@ public class Server {
 	/**
 	 * Šalje traženom presentityu zahtjev za praćenjem koji potječe od zadanog watchera.
 	 */
-	public void zahtjevZaPraćenjem(final String watcher, final String presentity, final VrstaPracenja vrstaPraćenja) {
-		korisnici.get(presentity).zahtjevZaPraćenjem(new Pracenje(watcher, vrstaPraćenja));
+	public void zahtjevZaPraćenjem(final Pracenje praćenje, final String presentity) {
+		korisnici.get(presentity).zahtjevZaPraćenjem(praćenje);
+	}
+
+	/**
+	 * Šalje traženom presentityu zahtjev za praćenjem koji potječe od zadanog watchera.
+	 */
+	public void zahtjevZaPraćenjem(final String watcher, final VrstaPracenja vrstaPraćenja, final String presentity) {
+		zahtjevZaPraćenjem(new Pracenje(watcher, vrstaPraćenja), presentity);
+	}
+
+	/** Šalje zadanom watcheru odgovor na zahtjev za praćenjem traženog presentitya. */
+	public void odgovorNaZahtjevZaPraćenjem(final String presentity, final String watcher, final VrstaPracenja vrstaPraćenja, final boolean odgovor) {
+		odgovorNaZahtjevZaPraćenjem(presentity, new Pracenje(watcher, vrstaPraćenja), odgovor);
 	}
 
 	/** Šalje zadanom watcheru odgovor na zahtjev za praćenjem traženog presentitya. */
@@ -77,10 +87,8 @@ public class Server {
 
 		if (odgovor) {
 			watcheriPresentitya.get(presentity).add(zahtjev);
-			watcher.odgovorNaZahtjevZaPraćenjem(presentity, true);
 			watcher.promjenaPrisutnosti(presentity, korisnici.get(presentity).getPrisutnost());
 		} else {
-			watcher.odgovorNaZahtjevZaPraćenjem(presentity, false);
 		}
 
 	}
@@ -104,7 +112,7 @@ public class Server {
 	 * Javlja svim registriranim aktivnim watcherima novu prisutnost zadanog presentitya.
 	 */
 	public void promjenaPrisutnosti(final String presentity, final Prisutnost prisutnost) {
-		korisnici.get(presentity).setPrisutnost(prisutnost);
+		korisnici.get(presentity).prisutnost = prisutnost;
 
 		for (final Pracenje praćenje: watcheriPresentitya.get(presentity)) {
 			if (praćenje.vrstaPraćenja == VrstaPracenja.AKTIVNO) {
@@ -136,8 +144,13 @@ public class Server {
 	}
 
 	/** Uklanja zadanog watchera sa liste watchera zadanog presentitya. */
+	public void ukiniPraćenje(final String presentity, final Pracenje praćenje) {
+		watcheriPresentitya.get(presentity).remove(praćenje);
+	}
+
+	/** Uklanja zadanog watchera sa liste watchera zadanog presentitya. */
 	public void ukiniPraćenje(final String presentity, final String watcher) {
-		watcheriPresentitya.get(presentity).remove(new Pracenje(watcher));
+		ukiniPraćenje(presentity, new Pracenje(watcher));
 	}
 
 }
