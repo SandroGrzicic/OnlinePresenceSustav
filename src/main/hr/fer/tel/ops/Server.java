@@ -114,7 +114,7 @@ public class Server {
 	 * Javlja svim registriranim aktivnim watcherima novu prisutnost zadanog presentitya.
 	 */
 	public void promjenaPrisutnosti(final String presentity, final Prisutnost prisutnost) {
-		korisnici.get(presentity).prisutnost = prisutnost;
+		korisnici.get(presentity).setPrisutnost(prisutnost);
 
 		for (final Pracenje praćenje: watcheriPresentitya.get(presentity)) {
 			if (praćenje.vrstaPraćenja == VrstaPracenja.AKTIVNO) {

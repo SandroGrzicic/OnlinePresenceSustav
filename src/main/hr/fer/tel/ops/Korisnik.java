@@ -59,10 +59,9 @@ public class Korisnik {
 		return prisutnost;
 	}
 
-	/** Postavlja trenutnu prisutnost ovog presentitya te obavještava server o promjeni. */
+	/** Postavlja trenutnu prisutnost ovog presentitya. */
 	public void setPrisutnost(final Prisutnost prisutnost) {
 		this.prisutnost = prisutnost;
-		this.server.promjenaPrisutnosti(korisničkoIme, prisutnost);
 	}
 
 	/**
