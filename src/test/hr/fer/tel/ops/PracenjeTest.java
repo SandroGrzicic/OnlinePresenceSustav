@@ -29,6 +29,8 @@ public class PracenjeTest {
 
 	@Test
 	public void testAktivnoPraćenje() throws Exception {
+		assert(server.korisnici.get(korisnik1).dohvatiPrisutnostZa(korisnik2).isLeft());
+
 		final Pracenje praćenje = new Pracenje(korisnik1, VrstaPracenja.AKTIVNO);
 		server.zahtjevZaPraćenjem(praćenje, korisnik2);
 		server.odgovorNaZahtjevZaPraćenjem(korisnik2, praćenje, true);
@@ -45,12 +47,28 @@ public class PracenjeTest {
 
 		server.ukiniPraćenje(korisnik2, praćenje);
 
-		server.promjenaPrisutnosti(korisnik1, Prisutnost.NEDOSTUPAN);
+		server.promjenaPrisutnosti(korisnik2, Prisutnost.NEDOSTUPAN);
 		assert(
 			server.korisnici.get(korisnik1).dohvatiPrisutnostZa(korisnik2).getRight() ==
 				Prisutnost.ZAUZET
 		);
+	}
 
+	@Test
+	public void testPasivnoPraćenje() throws Exception {
+		assert(server.korisnici.get(korisnik1).dohvatiPrisutnostZa(korisnik2).isLeft());
+
+		final Pracenje praćenje = new Pracenje(korisnik1, VrstaPracenja.PASIVNO);
+		server.zahtjevZaPraćenjem(praćenje, korisnik2);
+		server.odgovorNaZahtjevZaPraćenjem(korisnik2, praćenje, true);
+		assert(server.korisnici.get(korisnik1).dohvatiPrisutnostZa(korisnik2).isLeft());
+
+		server.promjenaPrisutnosti(korisnik2, Prisutnost.NEDOSTUPAN);
+		assert(server.dohvatiPrisutnost(praćenje, korisnik2).getRight() == Prisutnost.NEDOSTUPAN);
+		assert(server.korisnici.get(korisnik1).dohvatiPrisutnostZa(korisnik2).isLeft());
+
+		server.ukiniPraćenje(korisnik2, praćenje);
+		assert(server.dohvatiPrisutnost(praćenje, korisnik2).isLeft());
 	}
 
 }

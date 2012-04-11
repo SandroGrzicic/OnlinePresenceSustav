@@ -87,7 +87,9 @@ public class Server {
 
 		if (odgovor) {
 			watcheriPresentitya.get(presentity).add(zahtjev);
-			watcher.promjenaPrisutnosti(presentity, korisnici.get(presentity).getPrisutnost());
+			if (zahtjev.vrstaPraćenja == VrstaPracenja.AKTIVNO) {
+				watcher.promjenaPrisutnosti(presentity, korisnici.get(presentity).getPrisutnost());
+			}
 		} else {
 		}
 
