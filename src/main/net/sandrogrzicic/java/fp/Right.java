@@ -5,7 +5,7 @@ package net.sandrogrzicic.java.fp;
  */
 public class Right<T> extends Either<Void, T> {
 
-	public final T right;
+	private final T right;
 
 	public Right(T result) {
 		right = result;

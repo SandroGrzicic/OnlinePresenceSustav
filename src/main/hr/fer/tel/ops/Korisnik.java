@@ -14,7 +14,7 @@ import java.util.*;
  */
 public class Korisnik {
 
-	protected Server server;
+	protected final Server server;
 
 	/** Korisničko ime ovog korisnika. */
 	public final String korisničkoIme;
@@ -30,7 +30,7 @@ public class Korisnik {
 	/** Trenutna stanja prisutnosti presentitya koje prati ovaj watcher. */
 	protected final Map<String, Prisutnost> prisutnosti = new HashMap<>();
 
-	protected static SecureRandom random = new SecureRandom();
+	protected static final SecureRandom random = new SecureRandom();
 
 	protected static final MessageDigest messageDigest;
 
