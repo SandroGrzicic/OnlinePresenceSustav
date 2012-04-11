@@ -80,7 +80,7 @@ public class Server {
 		final Korisnik watcher = korisnici.get(zahtjev.watcher);
 
 		if (odgovor) {
-			watcheriPresentitya.get(presentity).add(new Pracenje(zahtjev.watcher, zahtjev.vrstaPraćenja));
+			watcheriPresentitya.get(presentity).add(zahtjev);
 			watcher.odgovorNaZahtjevZaPraćenjem(presentity, true);
 			watcher.promjenaPrisutnosti(presentity, prisutnosti.get(presentity));
 		} else {
@@ -123,12 +123,20 @@ public class Server {
 	 */
 	@SuppressWarnings("unchecked")
 	public Either<String, Prisutnost> dohvatiPrisutnost(final String watcher, final String presentity) {
-		if (watcheriPresentitya.get(presentity).contains(new Pracenje(watcher))) {
+		return dohvatiPrisutnost(new Pracenje(watcher), presentity);
+	}
+
+	/**
+	 * Dohvaća prisutnost zadanog presentitya.
+	 * @return Prisutnost wrappana u Right ako watcher ima dozvolu, Left ako nema.
+	 */
+	@SuppressWarnings("unchecked")
+	public Either<String, Prisutnost> dohvatiPrisutnost(final Pracenje pracenje, final String presentity) {
+		if (watcheriPresentitya.get(presentity).contains(pracenje)) {
 			return new Right(prisutnosti.get(presentity));
 		} else {
 			return new Left("Watcher nema dozvolu za dohvat prisutnosti zadanog entitya!");
 		}
-
 	}
 
 	/** Uklanja zadanog watchera sa liste watchera zadanog presentitya. */

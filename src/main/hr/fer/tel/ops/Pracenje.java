@@ -5,6 +5,7 @@ import java.util.Objects;
 /**
  * Praćenje nekog presentitya. Sadrži watchera koji prati presentity i vrstu praćenja.
  * Pri usporedbi, ova klasa se može smatrati wrapperom za String - ime watchera.
+ * Immutable.
  */
 public class Pracenje {
 

@@ -32,8 +32,6 @@ public class Korisnik {
 
 	protected static final MessageDigest messageDigest;
 
-
-
 	static {
 		try {
 			messageDigest = MessageDigest.getInstance("SHA-256");
