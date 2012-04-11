@@ -76,15 +76,15 @@ public class Server {
 	}
 
 	/** Šalje zadanom watcheru odgovor na zahtjev za praćenjem traženog presentitya. */
-	public void odgovorNaZahtjevZaPraćenjem(final String presentityIme, final Pracenje zahtjev, final boolean odgovor) {
+	public void odgovorNaZahtjevZaPraćenjem(final String presentity, final Pracenje zahtjev, final boolean odgovor) {
 		final Korisnik watcher = korisnici.get(zahtjev.watcher);
 
 		if (odgovor) {
-			watcheriPresentitya.get(presentityIme).add(new Pracenje(zahtjev.watcher, zahtjev.vrstaPraćenja));
-			watcher.odgovorNaZahtjevZaPraćenjem(presentityIme, true);
-			watcher.promjenaPrisutnosti(presentityIme, prisutnosti.get(presentityIme));
+			watcheriPresentitya.get(presentity).add(new Pracenje(zahtjev.watcher, zahtjev.vrstaPraćenja));
+			watcher.odgovorNaZahtjevZaPraćenjem(presentity, true);
+			watcher.promjenaPrisutnosti(presentity, prisutnosti.get(presentity));
 		} else {
-			watcher.odgovorNaZahtjevZaPraćenjem(presentityIme, false);
+			watcher.odgovorNaZahtjevZaPraćenjem(presentity, false);
 		}
 
 	}

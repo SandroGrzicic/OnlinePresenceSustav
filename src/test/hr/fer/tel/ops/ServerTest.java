@@ -63,17 +63,6 @@ public class ServerTest {
 	}
 
 	@Test
-	public void testAktivnoPraćenje() {
-
-
-	}
-
-	@Test
-	public void testPasivnoPraćenje() {
-
-	}
-
-	@Test
 	public void testUkidanjePraćenjaOdStraneWatchera() {
 	}
 
