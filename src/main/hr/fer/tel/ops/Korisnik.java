@@ -112,16 +112,6 @@ public class Korisnik {
 		prisutnosti.put(presentity, prisutnost);
 	}
 
-	/** Dojavljuje serveru da ukloni zadanog watchera sa liste watchera ovog presentitya. */
-	public void ukiniPraćenjeZaWatchera(final String watcher) {
-		server.ukiniPraćenje(korisničkoIme, watcher);
-	}
-
-	/** Dojavljuje serveru da ukloni ovog watchera sa sa liste watchera zadanog presentitya. */
-	public void ukiniPraćenjePresentitya(final String presentity) {
-		server.ukiniPraćenje(presentity, korisničkoIme);
-	}
-
 	/** @return trenutna prisutnost zadanog watchanog presentitya wrappana u Right, inače vraća Left. */
 	@SuppressWarnings("unchecked")
 	public Either<String, Prisutnost> dohvatiPrisutnostZa(final String presentity) {
