@@ -1,6 +1,5 @@
 package hr.fer.tel.ops;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,10 +20,6 @@ public class PracenjeTest {
 		server = new Server();
 		server.zahtjevZaRegistracijom(korisnik1, lozinka1);
 		server.zahtjevZaRegistracijom(korisnik2, lozinka2);
-	}
-
-	@After
-	public void tearDown() throws Exception {
 	}
 
 	@Test

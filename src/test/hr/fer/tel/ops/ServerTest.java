@@ -1,6 +1,5 @@
 package hr.fer.tel.ops;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,11 +19,6 @@ public class ServerTest {
 	@Before
 	public void setUp() throws Exception {
 		server = new Server();
-	}
-
-	@After
-	public void tearDown() throws Exception {
-
 	}
 
 	@Test
@@ -59,17 +53,6 @@ public class ServerTest {
 
 		assert(server.zahtjevZaUkidanjeRegistracije(korisničkoIme2, lozinka2).isRight());
 		assert(server.getBrojKorisnika() == 0);
-
 	}
-
-	@Test
-	public void testUkidanjePraćenjaOdStraneWatchera() {
-	}
-
-	@Test
-	public void testUkidanjePraćenjaOdStranePresentitya() {
-
-	}
-
 
 }
