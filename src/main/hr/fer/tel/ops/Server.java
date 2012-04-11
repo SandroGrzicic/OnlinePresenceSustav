@@ -65,25 +65,38 @@ public class Server {
 	/**
 	 * Šalje traženom presentityu zahtjev za praćenjem koji potječe od zadanog watchera.
 	 */
-	public void zahtjevZaPraćenjem(final Pracenje praćenje, final String presentity) {
-		korisnici.get(presentity).zahtjevZaPraćenjem(praćenje);
+	public void zahtjevZaPraćenjem(final String watcher, final VrstaPracenja vrstaPraćenja, final String presentity) {
+		zahtjevZaPraćenjem(new Pracenje(watcher, vrstaPraćenja), presentity);
 	}
 
 	/**
 	 * Šalje traženom presentityu zahtjev za praćenjem koji potječe od zadanog watchera.
 	 */
-	public void zahtjevZaPraćenjem(final String watcher, final VrstaPracenja vrstaPraćenja, final String presentity) {
-		zahtjevZaPraćenjem(new Pracenje(watcher, vrstaPraćenja), presentity);
+	public void zahtjevZaPraćenjem(final Pracenje praćenje, final String presentity) {
+		korisnici.get(presentity).zahtjevZaPraćenjem(praćenje);
 	}
 
-	/** Šalje zadanom watcheru odgovor na zahtjev za praćenjem traženog presentitya. */
+	/** @return Trenutni zahtjevi za praćenjem zadanog presentitya. */
+	public Set<Pracenje> zahtjeviZaPraćenjem(final String presentity) {
+		return Collections.unmodifiableSet(korisnici.get(presentity).zahtjeviZaPraćenjem);
+	}
+
+	/** Čisti zahtjeve za praćenjem zadanog presentitya. */
+	public void očistiZahtjeveZaPraćenjem(final String presentity) {
+		korisnici.get(presentity).zahtjeviZaPraćenjem.clear();
+	}
+
+
+	/** @see #odgovorNaZahtjevZaPraćenjem(String, Pracenje, boolean) */
 	public void odgovorNaZahtjevZaPraćenjem(final String presentity, final String watcher, final VrstaPracenja vrstaPraćenja, final boolean odgovor) {
 		odgovorNaZahtjevZaPraćenjem(presentity, new Pracenje(watcher, vrstaPraćenja), odgovor);
 	}
 
-	/** Šalje zadanom watcheru odgovor na zahtjev za praćenjem traženog presentitya. */
+	/** Šalje zadanom watcheru odgovor na zahtjev za praćenjem traženog presentitya i uklanja zahtjev iz popisa. */
 	public void odgovorNaZahtjevZaPraćenjem(final String presentity, final Pracenje zahtjev, final boolean odgovor) {
 		final Korisnik watcher = korisnici.get(zahtjev.watcher);
+
+		korisnici.get(presentity).zahtjeviZaPraćenjem.remove(zahtjev);
 
 		if (odgovor) {
 			watcheriPresentitya.get(presentity).add(zahtjev);
@@ -123,10 +136,7 @@ public class Server {
 		}
 	}
 
-	/**
-	 * Dohvaća prisutnost zadanog presentitya.
-	 * @return Prisutnost wrappana u Right ako watcher ima dozvolu, Left ako nema.
-	 */
+	/** @see #dohvatiPrisutnost(Pracenje, String) */
 	@SuppressWarnings("unchecked")
 	public Either<String, Prisutnost> dohvatiPrisutnost(final String watcher, final String presentity) {
 		return dohvatiPrisutnost(new Pracenje(watcher), presentity);
@@ -145,14 +155,15 @@ public class Server {
 		}
 	}
 
+	/** @see #ukiniPraćenje(String, Pracenje)  */
+	public void ukiniPraćenje(final String presentity, final String watcher) {
+		ukiniPraćenje(presentity, new Pracenje(watcher));
+	}
+
 	/** Uklanja zadanog watchera sa liste watchera zadanog presentitya. */
 	public void ukiniPraćenje(final String presentity, final Pracenje praćenje) {
 		watcheriPresentitya.get(presentity).remove(praćenje);
 	}
 
-	/** Uklanja zadanog watchera sa liste watchera zadanog presentitya. */
-	public void ukiniPraćenje(final String presentity, final String watcher) {
-		ukiniPraćenje(presentity, new Pracenje(watcher));
-	}
 
 }
