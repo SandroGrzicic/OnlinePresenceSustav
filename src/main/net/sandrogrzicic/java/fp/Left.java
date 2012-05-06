@@ -1,5 +1,7 @@
 package net.sandrogrzicic.java.fp;
 
+import java.util.Objects;
+
 /**
  * Represents one of the possible Either values.
  */
@@ -29,5 +31,10 @@ public class Left<T> extends Either<T, Void> {
 	@Override
 	public Void getRight() {
 		throw new RuntimeException("Left doesn't have a Right!");
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toString(left);
 	}
 }
