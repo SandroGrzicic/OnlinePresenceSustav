@@ -24,13 +24,16 @@ public class Korisnik {
 
 	protected Prisutnost prisutnost = Prisutnost.SLOBODAN;
 
-	/** Trenutni neodgovoreni zahtjevi za praćenjem od strane watchera za ovog presentitya. */
+	/** Neodgovoreni zahtjevi za praćenjem od strane watchera za ovog presentitya. */
 	protected final Set<Pracenje> zahtjeviZaPraćenjem = new HashSet<>(4);
 
-	/** Trenutna stanja prisutnosti presentitya koje prati ovaj watcher. */
+	/** Watcheri ovog presentitya. */
+	protected final Set<Pracenje> watcheri = new HashSet<>(4);
+
+	/** Stanja prisutnosti presentitya koje prati ovaj watcher. */
 	protected final Map<String, Prisutnost> prisutnosti = new HashMap<>(4);
 
-	/** Statička Random implementacija koja se koristi samo u konstruktoru. */
+	/** Statička Random implementacija. */
 	private static final Random random = new SecureRandom();
 
 	/** Statički MessageDigest kojeg mogu koristiti podklase. */
@@ -126,5 +129,10 @@ public class Korisnik {
 
 	public int dohvatiBrojZahtjevaZaPraćenjem() {
 		return zahtjeviZaPraćenjem.size();
+	}
+
+	@Override
+	public String toString() {
+		return korisničkoIme;
 	}
 }

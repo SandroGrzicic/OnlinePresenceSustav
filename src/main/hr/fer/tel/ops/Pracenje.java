@@ -42,4 +42,9 @@ public class Pracenje {
 	public int hashCode() {
 		return watcher.hashCode();
 	}
+
+	@Override
+	public String toString() {
+		return "(watcher='" + watcher + "', vrstaPraćenja=" + vrstaPraćenja + ')';
+	}
 }

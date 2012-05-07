@@ -12,9 +12,12 @@ import spark.Spark;
 import spark.route.SimpleRouteMatcher;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static spark.Spark.get;
 
 /**
@@ -97,20 +100,18 @@ public class App {
 		});
 
 		// vraća broj registriranih korisnika.
-		get(new Route("/count") {
+		get(new Route("/brojKorisnika") {
 			@Override
 			public Object handle(final Request request, final Response response) {
-				return string2xml(Integer.toString(server.getBrojKorisnika()));
+				return string2xml("brojKorisnika", Integer.toString(server.getBrojKorisnika()));
 			}
 		});
 
 		get(new Route("/zahtjev/:watcher/:pass/:presentity/:vrsta") {
 			@Override
 			public Object handle(final Request request, final Response response) {
-
-				final String poruka = provjeriLoginPodatke(request.params(":watcher"), request.params(":pass"));
-				if (poruka != null) {
-					return poruka;
+				if (!server.provjeriLogin(request.params(":watcher"), request.params(":pass"))) {
+					halt(SC_FORBIDDEN, string2xml("greška", "Korisnički podaci neispravni."));
 				}
 
 				final VrstaPracenja vrstaPraćenja;
@@ -134,10 +135,8 @@ public class App {
 		get(new Route("/ocisti/:presentity/:pass") {
 			@Override
 			public Object handle(final Request request, final Response response) {
-
-				final String poruka = provjeriLoginPodatke(request.params(":presentity"), request.params(":pass"));
-				if (poruka != null) {
-					return poruka;
+				if (!server.provjeriLogin(request.params(":presentity"), request.params(":pass"))) {
+					halt(SC_FORBIDDEN, string2xml("greška", "Korisnički podaci neispravni."));
 				}
 
 				final String presentity = request.params(":presentity");
@@ -150,20 +149,19 @@ public class App {
 			}
 		});
 
-	}
+		get(new Route("/zahtjevi/:presentity/:pass") {
+			@Override
+			public Object handle(final Request request, final Response response) {
+				if (!server.provjeriLogin(request.params(":presentity"), request.params(":pass"))) {
+					halt(SC_FORBIDDEN, string2xml("greška", "Korisnički podaci neispravni."));
+				}
 
-	/**
-	 * Provjerava ispravnost korisničkih podataka. Ako su neispravni, vraća odgovarajući XML odgovor,
-	 * inače vraća null.
-	 */
-	private String provjeriLoginPodatke(final String korisničkoIme, final String lozinka) {
-		if (server.provjeriLogin(korisničkoIme, lozinka)) {
-			return null;
-		} else {
-			return string2xml("Korisnički podaci neispravni.");
-		}
-	}
+				final String presentity = request.params(":presentity");
 
+				return either2xml(response, server.zahtjeviZaPraćenjem(presentity));
+			}
+		});
+	}
 
 	/**
 	 * Vraća sve trenutno podržane rute koristeći Reflection API.
@@ -193,36 +191,76 @@ public class App {
 	 * Generira XML odgovor na temelju zadanog Stringa.
 	 */
 	private static String string2xml(final String string) {
+		return string2xml("odgovor", string);
+	}
+
+	/**
+	 * Generira XML odgovor na temelju zadanog Stringa, wrappanog u element imeElementa.
+	 */
+	private static String string2xml(final String imeElementa, final String string) {
 		final Document doc = new Document();
 		final Element root = new Element("ops");
 		doc.setRootElement(root);
 
-		final Element odgovorEl = new Element("odgovor");
+		final Element odgovor = new Element(imeElementa);
 
-		odgovorEl.addContent(string);
-		root.addContent(odgovorEl);
+		odgovor.addContent(string);
+		root.addContent(odgovor);
 		return xmlOut.outputString(doc);
 	}
 
 	/**
 	 * Generira XML odgovor na temelju zadanog Eithera.
 	 */
-	private static String either2xml(final Response httpResponse, final Either<String, String> either) {
+	private static String either2xml(final Response httpResponse, final Either<String, ?> either) {
 		final Document dokument = new Document();
 		final Element root = new Element("ops");
 		dokument.setRootElement(root);
 
-		final Element odgovorEl = new Element(either.getClass().getSimpleName().toLowerCase());
-		root.addContent(odgovorEl);
+		final Element odgovor = new Element(either.getClass().getSimpleName().toLowerCase());
+		root.addContent(odgovor);
 
 		// vrati http odgovor sa kodom greške
 		if (either.isLeft()) {
 			httpResponse.status(SC_BAD_REQUEST);
 		}
 
-		odgovorEl.addContent(either.toString());
+		if (either.isRight()) {
+			final Object right = either.getRight();
+			if (right instanceof Collection<?>) {
+				for (Object e : (Collection<?>) right) {
+					dodajObjekt(odgovor, e);				}
+			} else if (right instanceof Map<?, ?>) {
+				for (Object e : ((Map<?, ?>) right).keySet()) {
+					dodajObjekt(odgovor, e);
+				}
+			} else {
+				odgovor.addContent(either.toString());
+			}
+		} else {
+			odgovor.addContent(either.toString());
+		}
 
 		return xmlOut.outputString(dokument);
+	}
+
+	/**
+	 * Dodaje XML elemente u zadani element, ovisno o zadanom objektu.
+	 */
+	private static void dodajObjekt(final Element odgovor, final Object e) {
+		if (e instanceof Pracenje) {
+			final Element praćenjeEl = new Element("praćenje");
+			final Pracenje praćenje = (Pracenje) e;
+			final Element watcher = new Element("watcher");
+			watcher.addContent(praćenje.watcher);
+			final Element vrstaPraćenja = new Element("vrstaPraćenja");
+			vrstaPraćenja.addContent(praćenje.vrstaPraćenja.toString());
+
+			praćenjeEl.addContent(watcher);
+			praćenjeEl.addContent(vrstaPraćenja);
+
+			odgovor.addContent(praćenjeEl);
+		}
 	}
 
 }
