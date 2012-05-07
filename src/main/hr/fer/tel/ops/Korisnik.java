@@ -119,8 +119,12 @@ public class Korisnik {
 		if (prisutnosti.containsKey(presentity)) {
 			return new Right(prisutnosti.get(presentity));
 		} else {
-			return new Left("Zadani presentity nije aktivno praćen!");
+			return new Left("Zadani presentity nije praćen!");
 		}
 
+	}
+
+	public int dohvatiBrojZahtjevaZaPraćenjem() {
+		return zahtjeviZaPraćenjem.size();
 	}
 }

@@ -52,28 +52,33 @@ public class Server {
 		Objects.requireNonNull(korisničkoIme, "Korisničko ime ne smije biti null!");
 		Objects.requireNonNull(lozinka, "Lozinka ne smije biti null!");
 
-		final Korisnik korisnik = korisnici.get(korisničkoIme);
-		if (korisnik != null) {
-			if (korisnik.provjeriLozinku(lozinka)) {
-				korisnici.remove(korisničkoIme);
-				return new Right("Registracija uspješno ukinuta.");
-			}
+		if (provjeriLogin(korisničkoIme, lozinka)) {
+			korisnici.remove(korisničkoIme);
+			return new Right("Registracija uspješno ukinuta.");
+		} else {
+			return new Left("Korisnik sa zadanim podacima ne postoji!");
 		}
-		return new Left("Korisnik sa zadanim podacima ne postoji!");
 	}
 
 	/**
 	 * Šalje traženom presentityu zahtjev za praćenjem koji potječe od zadanog watchera.
 	 */
-	public void zahtjevZaPraćenjem(final String watcher, final VrstaPracenja vrstaPraćenja, final String presentity) {
-		zahtjevZaPraćenjem(new Pracenje(watcher, vrstaPraćenja), presentity);
+	public Either<String, String> zahtjevZaPraćenjem(final String watcher, final VrstaPracenja vrstaPraćenja, final String presentity) {
+		return zahtjevZaPraćenjem(new Pracenje(watcher, vrstaPraćenja), presentity);
 	}
 
 	/**
 	 * Šalje traženom presentityu zahtjev za praćenjem koji potječe od zadanog watchera.
 	 */
-	public void zahtjevZaPraćenjem(final Pracenje praćenje, final String presentity) {
-		korisnici.get(presentity).zahtjevZaPraćenjem(praćenje);
+	@SuppressWarnings("unchecked")
+	public Either<String, String> zahtjevZaPraćenjem(final Pracenje praćenje, final String presentityIme) {
+		final Korisnik presentity = korisnici.get(presentityIme);
+		if (presentity == null) {
+			return new Left("Zadani presentity ne postoji!");
+		} else {
+			presentity.zahtjevZaPraćenjem(praćenje);
+			return new Right("Zahtjev za praćenjem uspješno dodan.");
+		}
 	}
 
 	/** @return Trenutni zahtjevi za praćenjem zadanog presentitya. */
@@ -103,7 +108,6 @@ public class Server {
 			if (zahtjev.vrstaPraćenja == VrstaPracenja.AKTIVNO) {
 				watcher.promjenaPrisutnosti(presentity, korisnici.get(presentity).getPrisutnost());
 			}
-		} else {
 		}
 
 	}
@@ -166,4 +170,14 @@ public class Server {
 	}
 
 
+	/** @return Jesu li korisnički podaci ispravni. */
+	public boolean provjeriLogin(final String korisničkoIme, final String lozinka) {
+		final Korisnik korisnik = korisnici.get(korisničkoIme);
+		return korisnik != null && korisnik.provjeriLozinku(lozinka);
+	}
+
+	public int dohvatiBrojZahtjevaZaPraćenjem(final String presentity) {
+		return korisnici.get(presentity).dohvatiBrojZahtjevaZaPraćenjem();
+
+	}
 }
