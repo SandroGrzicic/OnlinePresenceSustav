@@ -114,25 +114,15 @@ public class App {
 					halt(SC_FORBIDDEN, string2xml("greška", "Korisnički podaci neispravni."));
 				}
 
-				final VrstaPracenja vrstaPraćenja;
-
-				final char reqVrstaPraćenja = request.params(":vrsta").charAt(0);
-				if (reqVrstaPraćenja == 'a') {
-					vrstaPraćenja = VrstaPracenja.AKTIVNO;
-				} else if (reqVrstaPraćenja == 'p') {
-					vrstaPraćenja = VrstaPracenja.PASIVNO;
-				} else {
-					vrstaPraćenja = VrstaPracenja.NEDEFINIRANO;
-				}
-
 				final String watcher = request.params(":watcher");
+				final VrstaPracenja vrstaPraćenja = VrstaPracenja.char2vrsta(request.params(":vrsta").charAt(0));
 				final String presentity = request.params(":presentity");
 
 				return either2xml(response, server.zahtjevZaPraćenjem(watcher, vrstaPraćenja, presentity));
 			}
 		});
 
-		get(new Route("/ocisti/:presentity/:pass") {
+		get(new Route("/zahtjevi/ocisti/:presentity/:pass") {
 			@Override
 			public Object handle(final Request request, final Response response) {
 				if (!server.provjeriLogin(request.params(":presentity"), request.params(":pass"))) {
@@ -140,7 +130,6 @@ public class App {
 				}
 
 				final String presentity = request.params(":presentity");
-
 				final String brojZahtjeva = String.valueOf(server.dohvatiBrojZahtjevaZaPraćenjem(presentity));
 
 				server.očistiZahtjeveZaPraćenjem(presentity);
@@ -149,7 +138,7 @@ public class App {
 			}
 		});
 
-		get(new Route("/zahtjevi/:presentity/:pass") {
+		get(new Route("/zahtjevi/dohvati/:presentity/:pass") {
 			@Override
 			public Object handle(final Request request, final Response response) {
 				if (!server.provjeriLogin(request.params(":presentity"), request.params(":pass"))) {
@@ -161,6 +150,81 @@ public class App {
 				return either2xml(response, server.zahtjeviZaPraćenjem(presentity));
 			}
 		});
+
+		get(new Route("/odgovoriNaZahtjev/:presentity/:pass/:watcher/:vrsta/:odgovor") {
+			@Override
+			public Object handle(final Request request, final Response response) {
+				if (!server.provjeriLogin(request.params(":presentity"), request.params(":pass"))) {
+					halt(SC_FORBIDDEN, string2xml("greška", "Korisnički podaci neispravni."));
+				}
+
+				final String presentity = request.params(":presentity");
+				final VrstaPracenja vrstaPraćenja = VrstaPracenja.char2vrsta(request.params(":vrsta").charAt(0));
+				final String watcher = request.params(":watcher");
+				final boolean odgovor = request.params(":odgovor").toLowerCase().startsWith("t");
+
+				return either2xml(response, server.odgovorNaZahtjevZaPraćenjem(presentity, watcher, vrstaPraćenja, odgovor));
+			}
+		});
+
+		get(new Route("/prisutnost/promjeni/:presentity/:pass/:prisutnost") {
+			@Override
+			public Object handle(final Request request, final Response response) {
+				if (!server.provjeriLogin(request.params(":presentity"), request.params(":pass"))) {
+					halt(SC_FORBIDDEN, string2xml("greška", "Korisnički podaci neispravni."));
+				}
+
+				final String presentity = request.params(":presentity");
+				Prisutnost prisutnost = null;
+				try {
+				    prisutnost = Prisutnost.char2vrsta(request.params(":prisutnost").charAt(0));
+				} catch (IllegalArgumentException e) {
+					halt(SC_BAD_REQUEST, string2xml("greška", "Nevaljan tip prisutnosti."));
+				}
+
+				return either2xml(response, server.promjenaPrisutnosti(presentity, prisutnost));
+			}
+		});
+
+		get(new Route("/prisutnost/dohvati/:watcher/:pass/:presentity") {
+			@Override
+			public Object handle(final Request request, final Response response) {
+				if (!server.provjeriLogin(request.params(":watcher"), request.params(":pass"))) {
+					halt(SC_FORBIDDEN, string2xml("greška", "Korisnički podaci neispravni."));
+				}
+				final String watcher = request.params(":watcher");
+				final String presentity = request.params(":presentity");
+
+				return either2xml(response, server.dohvatiPrisutnost(watcher, presentity));
+			}
+		});
+
+		get(new Route("ukiniPracenje/presentity/:presentity/:pass/:watcher") {
+			@Override
+			public Object handle(final Request request, final Response response) {
+				if (!server.provjeriLogin(request.params(":presentity"), request.params(":pass"))) {
+					halt(SC_FORBIDDEN, string2xml("greška", "Korisnički podaci neispravni."));
+				}
+				final String presentity = request.params(":presentity");
+				final String watcher = request.params(":watcher");
+
+				return either2xml(response, server.ukiniPraćenje(presentity, watcher));
+			}
+		});
+
+		get(new Route("ukiniPracenje/watcher/:watcher/:pass/:presentity") {
+			@Override
+			public Object handle(final Request request, final Response response) {
+				if (!server.provjeriLogin(request.params(":watcher"), request.params(":pass"))) {
+					halt(SC_FORBIDDEN, string2xml("greška", "Korisnički podaci neispravni."));
+				}
+				final String watcher = request.params(":watcher");
+				final String presentity = request.params(":presentity");
+
+				return either2xml(response, server.ukiniPraćenje(presentity, watcher));
+			}
+		});
+
 	}
 
 	/**

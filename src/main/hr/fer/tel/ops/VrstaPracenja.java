@@ -6,5 +6,16 @@ package hr.fer.tel.ops;
 public enum VrstaPracenja {
 	AKTIVNO,
 	PASIVNO,
-	NEDEFINIRANO
+	NEDEFINIRANO;
+
+	/** Vraća VrstuPraćenja, ovisno o zadanom charu. */
+	public static VrstaPracenja char2vrsta(char vrsta) {
+		if (vrsta == 'a') {
+			return VrstaPracenja.AKTIVNO;
+		} else if (vrsta == 'p') {
+			return VrstaPracenja.PASIVNO;
+		} else {
+			return VrstaPracenja.NEDEFINIRANO;
+		}
+	}
 }

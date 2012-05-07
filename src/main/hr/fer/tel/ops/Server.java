@@ -94,8 +94,8 @@ public class Server {
 
 
 	/** @see #odgovorNaZahtjevZaPraćenjem(String, Pracenje, boolean) */
-	public void odgovorNaZahtjevZaPraćenjem(final String presentity, final String watcher, final VrstaPracenja vrstaPraćenja, final boolean odgovor) {
-		odgovorNaZahtjevZaPraćenjem(presentity, new Pracenje(watcher, vrstaPraćenja), odgovor);
+	public Either<String, String> odgovorNaZahtjevZaPraćenjem(final String presentity, final String watcher, final VrstaPracenja vrstaPraćenja, final boolean odgovor) {
+		return odgovorNaZahtjevZaPraćenjem(presentity, new Pracenje(watcher, vrstaPraćenja), odgovor);
 	}
 
 	/** Šalje zadanom watcheru odgovor na zahtjev za praćenjem traženog presentitya i uklanja zahtjev iz popisa. */
@@ -110,7 +110,9 @@ public class Server {
 		if (presentity == null) {
 			return new Left("Zadani presentity ne postoji!");
 		}
-		presentity.zahtjeviZaPraćenjem.remove(zahtjev);
+		if (!presentity.zahtjeviZaPraćenjem.remove(zahtjev)) {
+			return new Left("Zahtjev za praćenjem ne postoji!");
+		}
 
 		if (odgovor) {
 			presentity.watcheri.add(zahtjev);
@@ -123,20 +125,6 @@ public class Server {
 		}
 	}
 
-
-	public int getBrojKorisnika() {
-		return korisnici.size();
-	}
-
-	/**
-	 * @return Složenost zadane lozinke.
-	 */
-	protected static boolean provjeriSloženostLozinke(final String lozinka) {
-		if (lozinka.length() < 6) {
-			return false;
-		}
-		return true;
-	}
 
 	/**
 	 * Javlja svim registriranim aktivnim watcherima novu prisutnost zadanog presentitya.
@@ -207,9 +195,24 @@ public class Server {
 		return korisnik != null && korisnik.provjeriLozinku(lozinka);
 	}
 
+	/**
+	 * @return Složenost zadane lozinke.
+	 */
+	protected static boolean provjeriSloženostLozinke(final String lozinka) {
+		if (lozinka.length() < 6) {
+			return false;
+		}
+		return true;
+	}
+
 	public int dohvatiBrojZahtjevaZaPraćenjem(final String presentity) {
 		return korisnici.get(presentity).dohvatiBrojZahtjevaZaPraćenjem();
 
 	}
+
+	public int getBrojKorisnika() {
+		return korisnici.size();
+	}
+
 
 }
