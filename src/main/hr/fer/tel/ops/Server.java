@@ -142,6 +142,7 @@ public class Server {
 		for (final Pracenje praćenje: presentity.watcheri) {
 			if (praćenje.vrstaPraćenja == VrstaPracenja.AKTIVNO) {
 				korisnici.get(praćenje.watcher).promjenaPrisutnosti(presentityIme, prisutnost);
+				// TODO: dojaviti korisniku promjenu prisutnosti (AJAX push).
 			}
 		}
 		return new Right("Prisutnost uspješno promijenjena.");
@@ -154,7 +155,7 @@ public class Server {
 	}
 
 	/**
-	 * Dohvaća prisutnost zadanog presentitya.
+	 * Dohvaća (pasivno) prisutnost zadanog presentitya.
 	 * @return Prisutnost wrappana u Right ako watcher ima dozvolu, Left ako nema.
 	 */
 	@SuppressWarnings("unchecked")

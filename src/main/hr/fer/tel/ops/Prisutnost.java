@@ -11,10 +11,10 @@ public enum Prisutnost {
 	/**
 	 * Vraća odgovarajuću Prisutnost, ovisno o zadanom charu.
 	 */
-	public static Prisutnost char2vrsta(char vrsta) {
+	public static Prisutnost char2prisutnost(char vrsta) {
 		if (vrsta == 's' || vrsta == 'a' || vrsta == 'f') {
 			return Prisutnost.SLOBODAN;
-		} else if (vrsta == 'p' || vrsta == 'u') {
+		} else if (vrsta == 'n' || vrsta == 'u') {
 			return Prisutnost.NEDOSTUPAN;
 		} else if (vrsta == 'z' || vrsta == 'b') {
 			return Prisutnost.ZAUZET;

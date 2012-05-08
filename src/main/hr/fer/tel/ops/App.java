@@ -161,6 +161,7 @@ public class App {
 				final String presentity = request.params(":presentity");
 				final VrstaPracenja vrstaPraćenja = VrstaPracenja.char2vrsta(request.params(":vrsta").charAt(0));
 				final String watcher = request.params(":watcher");
+				// odgovor je potvrdan ako počinje s t
 				final boolean odgovor = request.params(":odgovor").toLowerCase().startsWith("t");
 
 				return either2xml(response, server.odgovorNaZahtjevZaPraćenjem(presentity, watcher, vrstaPraćenja, odgovor));
@@ -177,7 +178,7 @@ public class App {
 				final String presentity = request.params(":presentity");
 				Prisutnost prisutnost = null;
 				try {
-				    prisutnost = Prisutnost.char2vrsta(request.params(":prisutnost").charAt(0));
+				    prisutnost = Prisutnost.char2prisutnost(request.params(":prisutnost").charAt(0));
 				} catch (IllegalArgumentException e) {
 					halt(SC_BAD_REQUEST, string2xml("greška", "Nevaljan tip prisutnosti."));
 				}

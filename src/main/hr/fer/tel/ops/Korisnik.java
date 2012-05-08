@@ -110,13 +110,16 @@ public class Korisnik {
 	}
 
 	/**
-	 * Dojavljuje ovom watcheru da je zadani presentity promijenio stanje prisutnosti.
+	 * Aktivno praćenje: Dojavljuje ovom watcheru da je zadani presentity promijenio stanje prisutnosti.
 	 */
 	public void promjenaPrisutnosti(final String presentity, final Prisutnost prisutnost) {
 		prisutnosti.put(presentity, prisutnost);
 	}
 
-	/** @return trenutna prisutnost zadanog watchanog presentitya wrappana u Right, inače vraća Left. */
+	/**
+	 * Aktivno praćenje: Dohvat prisutnosti.
+	 * @return trenutna prisutnost zadanog watchanog presentitya wrappana u Right, inače vraća Left.
+	 */
 	@SuppressWarnings("unchecked")
 	public Either<String, Prisutnost> dohvatiPrisutnostZa(final String presentity) {
 		if (prisutnosti.containsKey(presentity)) {

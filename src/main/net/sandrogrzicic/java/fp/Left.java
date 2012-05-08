@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * Represents one of the possible Either values.
  */
-public class Left<T> extends Either<T, Void> {
+public final class Left<T> extends Either<T, Void> {
 
 	private final T left;
 
